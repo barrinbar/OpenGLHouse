@@ -100,73 +100,6 @@ void DrawCylinder(int n, double topr, double bottomr, int spaces, double startAn
 		glEnd();
 	}
 }
-void drawTree()
-{
-	// draw trunk
-	glColor3d(0.54, 0.27, 0.07);
-	glPushMatrix();
-	glRotated(0, 0, 1, 0);
-	glTranslated(0, 0, 0);
-	glScaled(1, 3, 1);
-	DrawCylinder(80, 3, 3, 1, 0, 2 * PI);
-	glPopMatrix();
-	// draw leaves
-	glColor3d(0, 1, 0);
-	glPushMatrix();
-	glRotated(0, 0, 1, 0);
-	glTranslated(0, 2, 0);
-	glScaled(1, 6, 1);
-	DrawCylinder(80, 0, 5, 1, 0, 2 * PI);
-	glPopMatrix();
-}
-
-void drawFence()
-{
-	// draw pillar 1
-	glColor3d(0.54, 0.27, 0.07);
-	glPushMatrix();
-	glRotated(0, 0, 1, 0);
-	glTranslated(20, 0, 0);
-	glScaled(1, 3, 1);
-	DrawCylinder(80, 2, 2, 1, 0, 2 * PI);
-	glPopMatrix();
-
-	// draw pillar 1
-	glColor3d(0.54, 0.27, 0.07);
-	glPushMatrix();
-	glRotated(0, 0, 1, 0);
-	glTranslated(20, 0, 20);
-	glScaled(1, 3, 1);
-	DrawCylinder(80, 2, 2, 1, 0, 2 * PI);
-	glPopMatrix();
-
-	// draw pillar 1
-	glColor3d(0.54, 0.27, 0.07);
-	glPushMatrix();
-	glRotated(0, 0, 1, 0);
-	glTranslated(0, 0, 20);
-	glScaled(1, 3, 1);
-	DrawCylinder(80, 2, 2, 1, 0, 2 * PI);
-	glPopMatrix();
-
-	// draw pillar 1
-	glColor3d(0.54, 0.27, 0.07);
-	glPushMatrix();
-	glRotated(0, 0, 1, 0);
-	glTranslated(0, 0, 20);
-	glScaled(1, 3, 1);
-	DrawCylinder(80, 2, 2, 1, 0, 2 * PI);
-	glPopMatrix();
-}
-void DrawSquare()
-{
-	glBegin(GL_POLYGON);
-	glVertex3d(-1, 1, 1);
-	glVertex3d(1, 1, 1);
-	glVertex3d(1, -1, 1);
-	glVertex3d(-1, -1, 1);
-	glEnd();
-}
 
 void DrawCube()
 {
@@ -213,6 +146,123 @@ void DrawCube()
 	glVertex3d(1, -1, 1);
 	glEnd();
 }
+void drawTree()
+{
+	// draw trunk
+	glColor3d(0.54, 0.27, 0.07);
+	glPushMatrix();
+	glRotated(0, 0, 1, 0);
+	glTranslated(0, 0, 0);
+	glScaled(1, 3, 1);
+	DrawCylinder(80, 3, 3, 1, 0, 2 * PI);
+	glPopMatrix();
+	// draw leaves
+	glColor3d(0, 1, 0);
+	glPushMatrix();
+	glRotated(0, 0, 1, 0);
+	glTranslated(0, 2, 0);
+	glScaled(1, 6, 1);
+	DrawCylinder(80, 0, 5, 1, 0, 2 * PI);
+	glPopMatrix();
+}
+
+void drawFence(int disatnce)
+{
+	// draw pillar 1
+	glColor3d(0.54, 0.27, 0.07);
+	glPushMatrix();
+	glRotated(0, 0, 1, 0);
+	glTranslated(disatnce, 0, 0);
+	glScaled(0.5, 3,0.5);
+	DrawCylinder(80, 2, 2, 1, 0, 2 * PI);
+	glPopMatrix();
+
+	// draw pillar 2
+	glColor3d(0.54, 0.27, 0.07);
+	glPushMatrix();
+	glRotated(0, 0, 1, 0);
+	glTranslated(0, 0, -disatnce);
+	glScaled(0.5, 3, 0.5);
+	DrawCylinder(80, 2, 2, 1, 0, 2 * PI);
+	glPopMatrix();
+
+	// draw wall betweem pillar 1 -2
+	glColor3d(0.54, 0.27, 0.07);
+	glPushMatrix();
+	glRotated(0, 0, 1, 0);
+	glTranslated(0, 0, -disatnce/2);
+	glScaled(0.1, 3, -disatnce/2);
+	DrawCube();
+	glPopMatrix();
+
+
+
+	// draw pillar 3
+	glColor3d(0.54, 0.27, 0.07);
+	glPushMatrix();
+	glRotated(0, 0, 1, 0);
+	glTranslated(disatnce, 0, -disatnce);
+	glScaled(0.5, 3, 0.5);
+	DrawCylinder(80, 2, 2, 1, 0, 2 * PI);
+	glPopMatrix();
+
+
+	// draw wall betweem pillar 2 -3
+	glColor3d(0.54, 0.27, 0.07);
+	glPushMatrix();
+	glRotated(0, 0, 1, 0);
+	glTranslated(disatnce/2, 0, -disatnce);
+	glScaled(-disatnce / 2, 3, 0.1);
+	DrawCube();
+	glPopMatrix();
+
+
+	// draw pillar 4
+	glColor3d(0.54, 0.27, 0.07);
+	glPushMatrix();
+	glRotated(0, 0, 1, 0);
+	glTranslated(0, 0, 0);
+	glScaled(0.5, 3, 0.5);
+	DrawCylinder(80, 2, 2, 1, 0, 2 * PI);
+	glPopMatrix();
+
+	// draw wall betweem pillar 3 -4
+	glColor3d(0.54, 0.27, 0.07);
+	glPushMatrix();
+	glRotated(0, 0, 1, 0);
+	glTranslated(disatnce , 0, -disatnce / 2);
+	glScaled(0.1, 3, disatnce / 2);
+	DrawCube();
+	glPopMatrix();
+
+	// draw wall betweem pillar 1 -4
+	glColor3d(0.54, 0.27, 0.07);
+	glPushMatrix();
+	glRotated(0, 0, 1, 0);
+	glTranslated(disatnce / 5, 0, 0);
+	glScaled(disatnce /5, 3, 0.1);
+	DrawCube();
+	glPopMatrix();
+
+	glColor3d(0.54, 0.27, 0.07);
+	glPushMatrix();
+	glRotated(0, 0, 1, 0);
+	glTranslated(disatnce-disatnce / 5, 0, 0);
+	glScaled(-disatnce / 5, 3, 0.1);
+	DrawCube();
+	glPopMatrix();
+
+}
+void DrawSquare()
+{
+	glBegin(GL_POLYGON);
+	glVertex3d(-1, 1, 1);
+	glVertex3d(1, 1, 1);
+	glVertex3d(1, -1, 1);
+	glVertex3d(-1, -1, 1);
+	glEnd();
+}
+
 
 void DrawPillar()
 {
@@ -350,12 +400,23 @@ void ShowAll()
 
 	drawStairs(10);
 	glPushMatrix();
-	glRotated(0, 0, 1, 0);
-	glTranslated(4, 0, 4);
-	glScaled(0.5, 2, 0.5);
-	drawTree();
+		glRotated(0, 0, 1, 0);
+		glTranslated(-10, 0, 15);
+		glScaled(0.5, 2, 0.5);
+		drawTree();
 	glPopMatrix();
-	drawFence();
+	glPushMatrix();
+		glRotated(0, 0, 1, 0);
+		glTranslated(10, 0, 15);
+		glScaled(0.5, 2, 0.5);
+		drawTree();
+		glPopMatrix();
+	glPushMatrix();
+		glRotated(0, 0, 1, 0);
+		glTranslated(-20, 0, 20);
+		drawFence(40);
+	glPopMatrix();
+	
 }
 
 // refresh
