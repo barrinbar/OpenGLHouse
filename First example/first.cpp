@@ -31,14 +31,114 @@ double angular_speed = 0;			// change position
 double sight = PI; 					// helps to calculate the change of position
 
 double ground[GSIZE][GSIZE];  		// simple ground
-double alpha = 0; // sun angle;
+
+unsigned char tx0[TSIZE][TSIZE][4]; // texture 0
+unsigned char tx1[TSIZE][512][4];	// texture 1
+unsigned char tx2[512][512][4]; // texture 2
+unsigned char tx3[TSIZE][TSIZE][4]; // texture 3
+
+unsigned char* bmp;
+
 rgb wallsColor = { 1,1,0.94 };
 rgb floorColor = { 1,1,0.98 };
 
 
-double sunPositionX = 1;
-double sunPositionY = 1;
-GLfloat mat_shininess[] = { 200 };
+	fread(bmp, 1, sz, pf);
+
+	fclose(pf);
+}
+
+// setup matrix of texture
+void SetTexture(int tx)
+{
+	int i, j;
+	switch (tx)
+	{
+	case 0:
+		for (i = 0;i<TSIZE;i++)
+			for (j = 0;j<TSIZE;j++)
+			{
+				if (i % 64 >= 60 ||  // horizontal lines
+					(((i / 64) % 2 == 0) && (j / (TSIZE / 4) == 0 &&
+						j % (TSIZE / 4) >= TSIZE / 4 - 3 || j / (TSIZE / 4) == 2 &&
+						j % (TSIZE / 4) >= TSIZE / 4 - 3) || // 3 bricks
+						(((i / 64) % 2 == 1) && ((j % (TSIZE / 2) >= TSIZE / 2 - 3))))) // 2 bricks
+				{
+					tx0[i][j][0] = 50; // red
+					tx0[i][j][1] = 50; // green
+					tx0[i][j][2] = 50; // blue
+					tx0[i][j][3] = 0;
+				}
+				else
+				{
+					tx0[i][j][0] = 200 + rand() % 55; // red
+					tx0[i][j][1] = 120 + rand() % 50; // green
+					tx0[i][j][2] = 0; // blue
+					tx0[i][j][3] = 0;
+				}
+			}
+		break;
+	case 1:
+	{
+		int k = 0;
+		for (i = 0;i < 256;i++)
+			for (j = 0;j < 512;j++, k += 3)
+			{
+				tx1[i][j][0] = bmp[k + 2]; // red
+				tx1[i][j][1] = bmp[k + 1]; // green
+				tx1[i][j][2] = bmp[k]; // blue
+				tx1[i][j][3] = 0;
+			}
+		break;
+	}
+	case 2:
+	{
+		int k = 0;
+		for (i = 0;i < 512;i++)
+			for (j = 0;j < 512;j++, k += 3)
+			{
+				tx2[i][j][0] = bmp[k + 2]; // red
+				tx2[i][j][1] = bmp[k + 1]; // green
+				tx2[i][j][2] = bmp[k]; // blue
+				tx2[i][j][3] = 0;
+			}
+		break;
+	}
+	}
+}
+
+
+void TextureDefintions()
+{
+	SetTexture(0);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, TSIZE, TSIZE,
+		0, GL_RGBA, GL_UNSIGNED_BYTE, tx0);
+
+	LoadBitmap("window.bmp");
+	SetTexture(1);
+	glBindTexture(GL_TEXTURE_2D, 1);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 512, 256,
+		0, GL_RGBA, GL_UNSIGNED_BYTE, tx1);
+
+	LoadBitmap("door.bmp");
+	SetTexture(2);
+	glBindTexture(GL_TEXTURE_2D, 2);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 512, 512,
+		0, GL_RGBA, GL_UNSIGNED_BYTE, tx2);
+}
 
 void init()
 {
@@ -106,6 +206,59 @@ void DrawCylinder(int n, double topr, double bottomr, int spaces, double startAn
 		glVertex3d(bottomr*sin(alpha), 0, bottomr*cos(alpha));
 		glEnd();
 	}
+}
+
+
+// TODO: adjust
+void DrawTexCylinder(int n, int tn, int r, double startAngle, double endAngle)
+{
+	/*double alpha;
+	double teta = 2 * PI / n;
+
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, tn); // tn is texture number
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE,
+		GL_MODULATE); // GL_MODULATE to get lighting
+
+	for (alpha = startAngle;alpha<endAngle;alpha += teta)
+	{
+		glBegin(GL_POLYGON);
+		glTexCoord2d(0, 0);
+		glVertex3d(r*sin(alpha), 1, r*cos(alpha));
+		glTexCoord2d(0, 2);
+		glVertex3d(r*sin(alpha + teta), 1, r*cos(alpha + teta));
+		glTexCoord2d(2, 2);
+		glVertex3d(r*sin(alpha + teta), -1, r*cos(alpha + teta));
+		glTexCoord2d(2, 0);
+		glVertex3d(r*sin(alpha), -1, r*cos(alpha));
+		glEnd();
+	}
+	glDisable(GL_TEXTURE_2D);*/
+
+
+	double alpha;
+	double teta = 2 * PI / n;
+
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, tn); // tn is texture number
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE,
+		GL_MODULATE); // GL_MODULATE to get lighting
+
+	for (alpha = startAngle;alpha<endAngle;alpha += teta)
+	{
+		glBegin(GL_POLYGON);
+		glTexCoord2d(0, teta);
+		glVertex3d(r*sin(alpha), 1, r*cos(alpha));
+		glTexCoord2d(teta, teta);
+		glVertex3d(r*sin(alpha + teta), 1, r*cos(alpha + teta));
+		glTexCoord2d(teta, 0);
+		glVertex3d(r*sin(alpha + teta), -1, r*cos(alpha + teta));
+		glTexCoord2d(0, 0);
+		glVertex3d(r*sin(alpha), -1, r*cos(alpha));
+		glEnd();
+	}
+	glDisable(GL_TEXTURE_2D);
+
 }
 
 void DrawCube()
@@ -297,8 +450,10 @@ void DrawDoor()
 	glColor3d(1, 0, 0);
 	// TODO: put texture
 	glPushMatrix();
-	glScaled(1, 6, 1);
-	DrawCylinder(60, 5, 5, 1, -0.1*PI, 0.1*PI);
+	glTranslated(0, 3.0, 0.1);
+	glScaled(1, 3, 1);
+	DrawTexCylinder(30, 2, 5, -0.1*PI, 0.1*PI);
+	//DrawCylinder(60, 5, 5, 1, -0.2*PI, 0.2*PI);
 	glPopMatrix();
 }
 
@@ -394,32 +549,32 @@ void DrawFront()
 	glColor3d(wallsColor.r, wallsColor.g, wallsColor.b);
 
 	glPushMatrix();
-		glTranslated(-44, 1, 3);
+		glTranslated(-38, 0.5, 3);
 		DrawPillar();
 	glPopMatrix();
 
 	glPushMatrix();
-		glTranslated(-22, 1, 3);
+		glTranslated(-23, 0.5, 3);
 		DrawPillar();
 	glPopMatrix();
 
 	glPushMatrix();
-		glTranslated(-10, 1, 3);
+		glTranslated(-8, 0.5, 3);
 		DrawPillar();
 	glPopMatrix();
 
 	glPushMatrix();
-		glTranslated(10, 1, 3);
+		glTranslated(8, 0.5, 3);
 		DrawPillar();
 	glPopMatrix();
 
 	glPushMatrix();
-	glTranslated(22, 1, 3);
-	DrawPillar();
+		glTranslated(23, 0.5, 3);
+		DrawPillar();
 	glPopMatrix();
 
 	glPushMatrix();
-	glTranslated(44, 1, 3);
+	glTranslated(38, 0.5, 3);
 	DrawPillar();
 	glPopMatrix();
 }
