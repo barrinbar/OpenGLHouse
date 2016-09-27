@@ -273,97 +273,128 @@ void DrawSquare()
 	glEnd();
 }
 
+void DrawWindow()
+{
+	glColor3d(1, 0, 0);
+	// TODO: put texture
+	glPushMatrix();
+	glScaled(3, 3, 1);
+	DrawSquare();
+	glPopMatrix();
+}
+
+void DrawDoor()
+{
+	glColor3d(1, 0, 0);
+	// TODO: put texture
+	glPushMatrix();
+	glScaled(1, 6, 1);
+	DrawCylinder(60, 5, 5, 1, -0.1*PI, 0.1*PI);
+	glPopMatrix();
+}
 
 void DrawPillar()
 {
+	glColor3d(wallsColor.r - 0.2, wallsColor.g - 0.2, wallsColor.b - 0.2);
 
 	// Bottom
 
 	glPushMatrix();
-	glScaled(1, 0.5, 1);
+	glScaled(1.75, 0.5, 1.75);
 	DrawCube();
 	glPopMatrix();
 
 	glPushMatrix();
 	glTranslated(0, 1, 0);
 	glScaled(1.5, 1, 1.5);
-	DrawCylinder(60, 5, 5, 1, 0, 2 * PI);
+	DrawCylinder(60, 1, 1, 1, 0, 2 * PI);
 	glPopMatrix();
 
 	// Body
 	glPushMatrix();
 	glTranslated(0, 2, 0);
-	glScaled(1, 10, 1);
-	DrawCylinder(60, 5, 5, 1, 0, 2 * PI);
+	glScaled(1, 16, 1);
+	DrawCylinder(60, 1, 1, 1, 0, 2 * PI);
 	glPopMatrix();
 
 	// Top
 	glPushMatrix();
-	glTranslated(0, 12, 0);
+	glTranslated(0, 18, 0);
 	glScaled(1.5, 1, 1.5);
-	DrawCylinder(60, 5, 5, 1, 0, 2 * PI);
+	DrawCylinder(60, 1, 1, 1, 0, 2 * PI);
 	glPopMatrix();
 
 	glPushMatrix();
-	glTranslated(0, 13, 0);
-	glScaled(1, 0.5, 1);
+	glTranslated(0, 19, 0);
+	glScaled(1.75, 0.5, 1.75);
 	DrawCube();
 	glPopMatrix();
 }
 
+void DrawWing()
+{
+	// Wall
+	glColor3d(wallsColor.r, wallsColor.g, wallsColor.b);
+	glPushMatrix();
+	glScaled(20, 20, 1);
+	DrawSquare();
+	glPopMatrix();
+
+	// Windows
+	glPushMatrix();
+	glTranslated(-7.5, 10, 0.01);
+	DrawWindow();
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslated(7.5, 10, 0.01);
+	DrawWindow();
+	glPopMatrix();
+
+}
+
 void DrawFront()
 {
+	glColor3d(wallsColor.r, wallsColor.g, wallsColor.b);
 	// Center wing
 	glPushMatrix();
 	glScaled(1, 20, 1);
-	DrawCylinder(60, 5, 5, 1, 0.5*PI, 1.5*PI);
-		glPopMatrix();
+	DrawCylinder(60, 5, 5, 1, -0.5*PI, 0.5*PI);
+	glPopMatrix();
 
-	// Door
-
-	glColor3d(1, 0, 0);
-	// TODO: put texture
 	glPushMatrix();
-	glTranslated(-2, 0, -20);
-	glScaled(4, 8, 1);
-	DrawSquare();
+	glTranslated(0, 0, 0.01);
+	DrawDoor();
 	glPopMatrix();
 	glColor3d(wallsColor.r, wallsColor.g, wallsColor.b);
 
 	// Left wing
 	glPushMatrix();
 	glTranslated(-25, 0, 0);
-	glScaled(20, 20, 1);
-	DrawSquare();
-	glPopMatrix();
-
-	// Windows
-	glPushMatrix();
-	glTranslated(-12, 0, -20);
-	glScaled(4, 4, 1);
-	DrawSquare();
+	DrawWing();
 	glPopMatrix();
 
 	// Right wing
 	glPushMatrix();
-	glTranslated(20, 0, 0);
-	glScaled(20, 20, 1);
-	DrawSquare();
+	glTranslated(25, 0, 0);
+	DrawWing();
 	glPopMatrix();
 
 	// Windows
 
 	// Pillars
+	glColor3d(wallsColor.r, wallsColor.g, wallsColor.b);
 	glPushMatrix();
-	glTranslated(-10, 0, -40);
+	glTranslated(-10, 0, 2);
 	DrawPillar();
 	glPopMatrix();
 
 	glPushMatrix();
-	glTranslated(10, 0, -40);
+	glTranslated(10, 0, 2);
 	DrawPillar();
 	glPopMatrix();
 }
+
 void drawStairsLevel(int posX, int posY, int posZ)
 {
 	glPushMatrix();
