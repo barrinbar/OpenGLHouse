@@ -252,6 +252,16 @@ void drawFence(int disatnce)
 	DrawCube();
 	glPopMatrix();
 
+	//draw road
+	glColor3d(0.54, 0.27, 0.07);
+	glPushMatrix();
+	glRotated(0, 0, 1, 0);
+	glTranslated(disatnce/2, 0, 0 -10);
+	glScaled(3, 0.1, disatnce / 4);
+	DrawCube();
+	glPopMatrix();
+
+
 }
 void DrawSquare()
 {
