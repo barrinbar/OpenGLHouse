@@ -82,6 +82,8 @@ void DrawGround()
 }
 
 // (5) PUT METHODS HERE
+
+
 void DrawCylinder(int n, double topr, double bottomr, int spaces, double startAngle, double endAngle)
 // sefault : n = 80(shrap), spaces = 1 (full cylinder), startAngle = 0, endAngle = 2*PI
 {
@@ -97,6 +99,64 @@ void DrawCylinder(int n, double topr, double bottomr, int spaces, double startAn
 		glVertex3d(bottomr*sin(alpha), 0, bottomr*cos(alpha));
 		glEnd();
 	}
+}
+void drawTree()
+{
+	// draw trunk
+	glColor3d(0.54, 0.27, 0.07);
+	glPushMatrix();
+	glRotated(0, 0, 1, 0);
+	glTranslated(0, 0, 0);
+	glScaled(1, 3, 1);
+	DrawCylinder(80, 3, 3, 1, 0, 2 * PI);
+	glPopMatrix();
+	// draw leaves
+	glColor3d(0, 1, 0);
+	glPushMatrix();
+	glRotated(0, 0, 1, 0);
+	glTranslated(0, 2, 0);
+	glScaled(1, 6, 1);
+	DrawCylinder(80, 0, 5, 1, 0, 2 * PI);
+	glPopMatrix();
+}
+
+void drawFence()
+{
+	// draw pillar 1
+	glColor3d(0.54, 0.27, 0.07);
+	glPushMatrix();
+	glRotated(0, 0, 1, 0);
+	glTranslated(20, 0, 0);
+	glScaled(1, 3, 1);
+	DrawCylinder(80, 2, 2, 1, 0, 2 * PI);
+	glPopMatrix();
+
+	// draw pillar 1
+	glColor3d(0.54, 0.27, 0.07);
+	glPushMatrix();
+	glRotated(0, 0, 1, 0);
+	glTranslated(20, 0, 20);
+	glScaled(1, 3, 1);
+	DrawCylinder(80, 2, 2, 1, 0, 2 * PI);
+	glPopMatrix();
+
+	// draw pillar 1
+	glColor3d(0.54, 0.27, 0.07);
+	glPushMatrix();
+	glRotated(0, 0, 1, 0);
+	glTranslated(0, 0, 20);
+	glScaled(1, 3, 1);
+	DrawCylinder(80, 2, 2, 1, 0, 2 * PI);
+	glPopMatrix();
+
+	// draw pillar 1
+	glColor3d(0.54, 0.27, 0.07);
+	glPushMatrix();
+	glRotated(0, 0, 1, 0);
+	glTranslated(0, 0, 20);
+	glScaled(1, 3, 1);
+	DrawCylinder(80, 2, 2, 1, 0, 2 * PI);
+	glPopMatrix();
 }
 void DrawSquare()
 {
@@ -244,7 +304,23 @@ void DrawFront()
 	DrawPillar();
 	glPopMatrix();
 }
+void drawStairsLevel(int posX, int posY, int posZ)
+{
+	glPushMatrix();
+	glRotated(0, 0, 1, 0);
+	glTranslated(posX, posY, posZ);
+	glScaled(4, 1, 1);
+	glColor3d(wallsColor.r, wallsColor.g, wallsColor.b); // choose color
+	DrawCube();
+	glPopMatrix();;
+}
 
+void drawStairs(int levels)
+{
+	int i;
+	for (i = 0; i<levels; i++)
+		drawStairsLevel(0, i, i);
+}
 void DrawExterior()
 {
 	glColor3d(wallsColor.r, wallsColor.g, wallsColor.b);
@@ -272,6 +348,14 @@ void ShowAll()
 
 	DrawHouse();
 
+	drawStairs(10);
+	glPushMatrix();
+	glRotated(0, 0, 1, 0);
+	glTranslated(4, 0, 4);
+	glScaled(0.5, 2, 0.5);
+	drawTree();
+	glPopMatrix();
+	drawFence();
 }
 
 // refresh
