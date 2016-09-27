@@ -31,12 +31,20 @@ double angular_speed = 0;			// change position
 double sight = PI; 					// helps to calculate the change of position
 
 double ground[GSIZE][GSIZE];  		// simple ground
-
+double alpha = 0; // sun angle;
 rgb wallsColor = { 1,1,0.94 };
+
+
+double sunPositionX = 1;
+double sunPositionY = 1;
+
+GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 0 };
+GLfloat mat_shininess[] = { 200 };
 
 void init()
 {
 	int i, j;
+
 
 	// optional set random values
 	srand(time(0));
@@ -49,7 +57,7 @@ void init()
 	// (4) PUT CONTENT HERE
 
 	// set background color
-	glClearColor(0, 1, 1, 0);
+	glClearColor(0, 0.8, 1, 0);
 	glEnable(GL_DEPTH_TEST);
 }
 
@@ -578,6 +586,39 @@ void ShowAll()
 	
 }
 
+
+void addLight()
+{
+	GLfloat light_position[] = { 40,sunPositionY,sunPositionX, 1 };
+
+	glEnable(GL_COLOR_MATERIAL); // to save the original color ov the object
+	glShadeModel(GL_SMOOTH);
+
+	//glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+	glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+	glEnable(GL_DEPTH_TEST);
+	
+}
+
+//draw sun
+void drawSun()
+{
+	glDisable(GL_LIGHTING);
+	glColor3d(1, 1, 0);
+	glPushMatrix();
+	glRotated(0, 0, 1, 0);
+	glTranslated(sunPositionY, sunPositionX, 1);
+	glScaled(10, 10, 10);
+	DrawSphere(80, 80, 1, -PI / 2, PI / 2);
+	glPopMatrix();
+	glEnable(GL_LIGHTING);
+}
+
+
 // refresh
 void display()
 {
@@ -588,7 +629,9 @@ void display()
 
 	glFrustum(-1, 1, -1, 1, 0.7, 300); // perspective projection(left,right,bottom,top,near,far)
 	gluLookAt(eyex, eyey, eyez, eyex + dirx, eyey - 0.5, eyez + dirz, 0, 1, 0);// (eye,dir,up)
-
+	
+	drawSun();
+	addLight();
 	ShowAll();
 
 	// (7) PUT CONTENT HERE
@@ -613,6 +656,9 @@ void idle() // WRITE OFFSETS IN THIS METHOD
 	dy = 0;
 	dx = 0;
 
+	alpha += 0.001;
+	sunPositionX = cos(alpha)*cos(alpha)*100;
+	sunPositionY = sin(alpha)*sin(alpha)*100;
 	// (8) PUT CONTENT HERE
 
 	glutPostRedisplay(); //-> display
