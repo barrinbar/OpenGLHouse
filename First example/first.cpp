@@ -454,7 +454,8 @@ void ShowAll()
 		glPopMatrix();
 	glPushMatrix();
 		glRotated(0, 0, 1, 0);
-		glTranslated(-20, 0, 20);
+		glTranslated(-20*3, 0, 20*2);
+		glScaled(3, 1, 3);
 		drawFence(40);
 	glPopMatrix();
 	
