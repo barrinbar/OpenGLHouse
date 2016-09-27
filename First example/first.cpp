@@ -336,7 +336,8 @@ void DrawWing()
 	// Wall
 	glColor3d(wallsColor.r, wallsColor.g, wallsColor.b);
 	glPushMatrix();
-	glScaled(20, 20, 1);
+	glTranslated(0, 10, 0);
+	glScaled(20, 10, 1);
 	DrawSquare();
 	glPopMatrix();
 
@@ -380,20 +381,29 @@ void DrawFront()
 	DrawWing();
 	glPopMatrix();
 
-	// Windows
-
 	// Pillars
 	glColor3d(wallsColor.r, wallsColor.g, wallsColor.b);
 	glPushMatrix();
-	glTranslated(-10, 0, 2);
+	glTranslated(-10, 1, 3);
 	DrawPillar();
 	glPopMatrix();
 
 	glPushMatrix();
-	glTranslated(10, 0, 2);
+	glTranslated(10, 1, 3);
 	DrawPillar();
 	glPopMatrix();
 }
+
+void DrawLeft()
+{
+	// Left wing
+	glPushMatrix();
+	glRotated(0, 1, 0, 90);
+	glTranslated(-25, 0, 0);
+	DrawWing();
+	glPopMatrix();
+}
+
 
 void drawStairsLevel(int posX, int posY, int posZ)
 {
