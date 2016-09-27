@@ -273,6 +273,27 @@ void DrawSquare()
 	glEnd();
 }
 
+void DrawCircle()
+{
+	//filled circle
+	float x1, y1, x2, y2;
+	float angle;
+	double radius = 1;
+
+	x1 = 0.0, y1 = 0.0;
+	
+	glBegin(GL_TRIANGLE_FAN);
+	glVertex2f(x1, y1);
+
+	for (angle = 1.0f;angle<361.0f;angle += 0.2)
+	{
+		x2 = x1 + sin(angle)*radius;
+		y2 = y1 + cos(angle)*radius;
+		glVertex2f(x2, y2);
+	}
+
+	glEnd();
+}
 void DrawWindow()
 {
 	glColor3d(1, 0, 0);
@@ -298,22 +319,27 @@ void DrawPillar()
 	glColor3d(wallsColor.r - 0.2, wallsColor.g - 0.2, wallsColor.b - 0.2);
 
 	// Bottom
-
 	glPushMatrix();
+	glTranslated(0, 0, 0);
 	glScaled(1.75, 0.5, 1.75);
 	DrawCube();
 	glPopMatrix();
 
 	glPushMatrix();
-	glTranslated(0, 1, 0);
 	glScaled(1.5, 1, 1.5);
+	
+	glPushMatrix();
+		glRotated(90, 1, 0, 0);
+		DrawCircle();
+	glPopMatrix();
+
 	DrawCylinder(60, 1, 1, 1, 0, 2 * PI);
 	glPopMatrix();
 
 	// Body
 	glPushMatrix();
-	glTranslated(0, 2, 0);
-	glScaled(1, 16, 1);
+	glTranslated(0, 1, 0);
+	glScaled(1, 17, 1);
 	DrawCylinder(60, 1, 1, 1, 0, 2 * PI);
 	glPopMatrix();
 
@@ -322,6 +348,10 @@ void DrawPillar()
 	glTranslated(0, 18, 0);
 	glScaled(1.5, 1, 1.5);
 	DrawCylinder(60, 1, 1, 1, 0, 2 * PI);
+	glPushMatrix();
+	glRotated(90, 1, 0, 0);
+	DrawCircle();
+	glPopMatrix();
 	glPopMatrix();
 
 	glPushMatrix();
@@ -385,32 +415,32 @@ void DrawFront()
 	glColor3d(wallsColor.r, wallsColor.g, wallsColor.b);
 
 	glPushMatrix();
-		glTranslated(-44, 1, 3);
+		glTranslated(-40, 0.5, 3);
 		DrawPillar();
 	glPopMatrix();
 
 	glPushMatrix();
-		glTranslated(-22, 1, 3);
+		glTranslated(-25, 0.5, 3);
 		DrawPillar();
 	glPopMatrix();
 
 	glPushMatrix();
-		glTranslated(-10, 1, 3);
+		glTranslated(-10, 0.5, 3);
 		DrawPillar();
 	glPopMatrix();
 
 	glPushMatrix();
-		glTranslated(10, 1, 3);
+		glTranslated(10, 0.5, 3);
 		DrawPillar();
 	glPopMatrix();
 
 	glPushMatrix();
-	glTranslated(22, 1, 3);
-	DrawPillar();
+		glTranslated(25, 0.5, 3);
+		DrawPillar();
 	glPopMatrix();
 
 	glPushMatrix();
-	glTranslated(44, 1, 3);
+	glTranslated(40, 0.5, 3);
 	DrawPillar();
 	glPopMatrix();
 }
