@@ -6,6 +6,7 @@
 #include "GLUT.H"
 #include <math.h>
 #include <time.h>
+#include <stdio.h>
 
 #define HEIGHT 600
 #define WIDTH 600
@@ -17,6 +18,8 @@ struct rgb {
 };
 
 const int GSIZE = 200;  			// size to paint the ground
+const int TSIZE = 256;				// size of texture must be power of two
+
 const double PI = 4 * atan(1.0);  	// define PI
 									// (1) PUT  CONST HERE
 
@@ -32,7 +35,100 @@ double sight = PI; 					// helps to calculate the change of position
 
 double ground[GSIZE][GSIZE];  		// simple ground
 
+unsigned char tx0[TSIZE][TSIZE][4]; // texture 0
+unsigned char tx1[TSIZE][512][4];	// texture 1
+unsigned char tx2[TSIZE][TSIZE][4]; // texture 2
+unsigned char tx3[TSIZE][TSIZE][4]; // texture 3
+
+unsigned char* bmp;
+
 rgb wallsColor = { 1,1,0.94 };
+
+void LoadBitmap(char *fname)
+{
+	FILE* pf;
+	BITMAPFILEHEADER bf;
+	BITMAPINFOHEADER bi;
+	int sz;
+
+	pf = fopen(fname, "rb");
+	fread(&bf, sizeof(BITMAPFILEHEADER), 1, pf);
+	fread(&bi, sizeof(BITMAPINFOHEADER), 1, pf);
+
+	sz = bi.biHeight*bi.biWidth * 3;
+	bmp = (unsigned char*)malloc(sz);
+
+	fread(bmp, 1, sz, pf);
+
+	fclose(pf);
+}
+
+// setup matrix of texture
+void SetTexture(int tx)
+{
+	int i, j;
+	switch (tx)
+	{
+	case 0:
+		for (i = 0;i<TSIZE;i++)
+			for (j = 0;j<TSIZE;j++)
+			{
+				if (i % 64 >= 60 ||  // horizontal lines
+					(((i / 64) % 2 == 0) && (j / (TSIZE / 4) == 0 &&
+						j % (TSIZE / 4) >= TSIZE / 4 - 3 || j / (TSIZE / 4) == 2 &&
+						j % (TSIZE / 4) >= TSIZE / 4 - 3) || // 3 bricks
+						(((i / 64) % 2 == 1) && ((j % (TSIZE / 2) >= TSIZE / 2 - 3))))) // 2 bricks
+				{
+					tx0[i][j][0] = 50; // red
+					tx0[i][j][1] = 50; // green
+					tx0[i][j][2] = 50; // blue
+					tx0[i][j][3] = 0;
+				}
+				else
+				{
+					tx0[i][j][0] = 200 + rand() % 55; // red
+					tx0[i][j][1] = 120 + rand() % 50; // green
+					tx0[i][j][2] = 0; // blue
+					tx0[i][j][3] = 0;
+				}
+			}
+		break;
+	case 1:
+		int k = 0;
+		for (i = 0;i<256;i++)
+			for (j = 0;j<512;j++, k += 3)
+			{
+				tx1[i][j][0] = bmp[k + 2]; // red
+				tx1[i][j][1] = bmp[k + 1]; // green
+				tx1[i][j][2] = bmp[k]; // blue
+				tx1[i][j][3] = 0;
+			}
+		break;
+	}
+}
+
+
+void TextureDefintions()
+{
+	SetTexture(0);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, TSIZE, TSIZE,
+		0, GL_RGBA, GL_UNSIGNED_BYTE, tx0);
+
+	LoadBitmap("window.bmp");
+	SetTexture(1);
+	glBindTexture(GL_TEXTURE_2D, 1);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 512, 256,
+		0, GL_RGBA, GL_UNSIGNED_BYTE, tx1);
+}
 
 void init()
 {
@@ -51,8 +147,9 @@ void init()
 	// set background color
 	glClearColor(0, 1, 1, 0);
 	glEnable(GL_DEPTH_TEST);
-}
 
+	TextureDefintions();
+}
 
 void DrawGround()
 {
@@ -99,6 +196,38 @@ void DrawCylinder(int n, double topr, double bottomr, int spaces, double startAn
 		glVertex3d(bottomr*sin(alpha), 0, bottomr*cos(alpha));
 		glEnd();
 	}
+}
+
+
+// TODO: adjust
+void DrawTexCylinder(int n, int tn)
+{
+	double alpha;
+	double teta = 2 * PI / n;
+
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, tn); // tn is texture number
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE,
+		GL_MODULATE); // GL_MODULATE to get lighting
+
+	for (alpha = 0;alpha<2 * PI;alpha += teta)
+	{
+		glBegin(GL_POLYGON);
+		//				glColor3d(fabs(sin(alpha)),(1+cos(alpha))/2,0.5*cos(alpha));
+
+		glTexCoord2d(0, 5);
+		glVertex3d(sin(alpha), 1, cos(alpha));
+		glTexCoord2d(2, 5);
+		glVertex3d(sin(alpha + teta), 1, cos(alpha + teta));
+		//				glColor3d(1-fabs(sin(alpha)),0.5*(1+cos(alpha))/2,0.8*cos(alpha));
+		glTexCoord2d(2, 0);
+		glVertex3d(sin(alpha + teta), -1, cos(alpha + teta));
+		glTexCoord2d(0, 0);
+		glVertex3d(sin(alpha), -1, cos(alpha));
+		glEnd();
+	}
+	glDisable(GL_TEXTURE_2D);
+
 }
 
 void DrawCube()
@@ -266,10 +395,10 @@ void drawFence(int disatnce)
 void DrawSquare()
 {
 	glBegin(GL_POLYGON);
-	glVertex3d(-1, 1, 1);
-	glVertex3d(1, 1, 1);
-	glVertex3d(1, -1, 1);
-	glVertex3d(-1, -1, 1);
+	glVertex3d(-1, 1, 0);
+	glVertex3d(1, 1, 0);
+	glVertex3d(1, -1, 0);
+	glVertex3d(-1, -1, 0);
 	glEnd();
 }
 
@@ -296,12 +425,21 @@ void DrawCircle()
 }
 void DrawWindow()
 {
-	glColor3d(1, 0, 0);
-	// TODO: put texture
-	glPushMatrix();
-	glScaled(3, 3, 1);
-	DrawSquare();
-	glPopMatrix();
+	// using texture
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, 1);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE); // GL_MODULATE to get lighting
+	glBegin(GL_POLYGON);
+	glTexCoord2d(0, 0);
+	glVertex3d(-4, 0, 0);
+	glTexCoord2d(0, 1);
+	glVertex3d(-4, 4, 0);
+	glTexCoord2d(1, 1);
+	glVertex3d(4, 4, 0);
+	glTexCoord2d(1, 0);
+	glVertex3d(4, 0, 0);
+	glEnd();
+	glDisable(GL_TEXTURE_2D);
 }
 
 void DrawDoor()
@@ -309,8 +447,8 @@ void DrawDoor()
 	glColor3d(1, 0, 0);
 	// TODO: put texture
 	glPushMatrix();
-	glScaled(1, 6, 1);
-	DrawCylinder(60, 5, 5, 1, -0.1*PI, 0.1*PI);
+	glScaled(1, 8, 1);
+	DrawCylinder(60, 5, 5, 1, -0.2*PI, 0.2*PI);
 	glPopMatrix();
 }
 
@@ -373,15 +511,24 @@ void DrawWing()
 
 	// Windows
 	glPushMatrix();
-	glTranslated(-7.5, 10, 0.01);
+	glTranslated(-7.5, 5, 0.01);
 	DrawWindow();
 	glPopMatrix();
 
 	glPushMatrix();
-	glTranslated(7.5, 10, 0.01);
+	glTranslated(7.5, 5, 0.01);
 	DrawWindow();
 	glPopMatrix();
 
+	glPushMatrix();
+	glTranslated(-7.5, 15, 0.01);
+	DrawWindow();
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslated(7.5, 15, 0.01);
+	DrawWindow();
+	glPopMatrix();
 }
 
 void DrawFront()
@@ -527,7 +674,12 @@ void DrawExterior()
 	glScaled(65, 20, 65);
 	drawRoof();
 	glPopMatrix();
-
+	
+	/*glPushMatrix();
+	glTranslated(0, 10, 20);
+	glScaled(5, 10, 5);
+	DrawTexCylinder(8, 1);
+	glPopMatrix();*/
 
 }
 void DrawHouse()
