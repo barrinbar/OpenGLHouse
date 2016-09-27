@@ -6,6 +6,7 @@
 #include "GLUT.H"
 #include <math.h>
 #include <time.h>
+#include <stdio.h>
 
 #define HEIGHT 600
 #define WIDTH 600
@@ -17,6 +18,8 @@ struct rgb {
 };
 
 const int GSIZE = 200;  			// size to paint the ground
+const int TSIZE = 256;				// size of texture must be power of two
+
 const double PI = 4 * atan(1.0);  	// define PI
 									// (1) PUT  CONST HERE
 
@@ -42,6 +45,25 @@ unsigned char* bmp;
 rgb wallsColor = { 1,1,0.94 };
 rgb floorColor = { 1,1,0.98 };
 
+double sunPositionX = 1;
+double sunPositionY = 1;
+GLfloat mat_shininess[] = { 200 };
+double sun_alpha = 0; // sun angle;
+
+
+void LoadBitmap(char *fname)
+{
+	FILE* pf;
+	BITMAPFILEHEADER bf;
+	BITMAPINFOHEADER bi;
+	int sz;
+
+	pf = fopen(fname, "rb");
+	fread(&bf, sizeof(BITMAPFILEHEADER), 1, pf);
+	fread(&bi, sizeof(BITMAPINFOHEADER), 1, pf);
+
+	sz = bi.biHeight*bi.biWidth * 3;
+	bmp = (unsigned char*)malloc(sz);
 
 	fread(bmp, 1, sz, pf);
 
@@ -158,6 +180,8 @@ void init()
 	// set background color
 	glClearColor(0, 0.8, 1, 0);
 	glEnable(GL_DEPTH_TEST);
+
+	TextureDefintions();
 }
 
 
@@ -212,30 +236,6 @@ void DrawCylinder(int n, double topr, double bottomr, int spaces, double startAn
 // TODO: adjust
 void DrawTexCylinder(int n, int tn, int r, double startAngle, double endAngle)
 {
-	/*double alpha;
-	double teta = 2 * PI / n;
-
-	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, tn); // tn is texture number
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE,
-		GL_MODULATE); // GL_MODULATE to get lighting
-
-	for (alpha = startAngle;alpha<endAngle;alpha += teta)
-	{
-		glBegin(GL_POLYGON);
-		glTexCoord2d(0, 0);
-		glVertex3d(r*sin(alpha), 1, r*cos(alpha));
-		glTexCoord2d(0, 2);
-		glVertex3d(r*sin(alpha + teta), 1, r*cos(alpha + teta));
-		glTexCoord2d(2, 2);
-		glVertex3d(r*sin(alpha + teta), -1, r*cos(alpha + teta));
-		glTexCoord2d(2, 0);
-		glVertex3d(r*sin(alpha), -1, r*cos(alpha));
-		glEnd();
-	}
-	glDisable(GL_TEXTURE_2D);*/
-
-
 	double alpha;
 	double teta = 2 * PI / n;
 
@@ -435,11 +435,25 @@ void DrawSquare()
 
 void DrawWindow()
 {
-	glColor3d(1, 0, 0);
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, 1); // tn is texture number
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE,
+		GL_MODULATE); // GL_MODULATE to get lighting
+
+	//glColor3d(1, 0, 0);
 	// TODO: put texture
 	glPushMatrix();
-	glScaled(3, 3, 1);
-	DrawSquare();
+	//glScaled(3, 3, 1);
+	glBegin(GL_POLYGON);
+	glTexCoord2d(0, 1);
+	glVertex3d(-2, 2, 1);
+	glTexCoord2d(1, 1);
+	glVertex3d(2, 2, 1);
+	glTexCoord2d(1, 0);
+	glVertex3d(2, -2, 1);
+	glTexCoord2d(0, 0);
+	glVertex3d(-2, -2, 1);
+	glEnd();
 	glPopMatrix();
 }
 
@@ -507,12 +521,22 @@ void DrawWing()
 
 	// Windows
 	glPushMatrix();
-	glTranslated(-7.5, 10, 0.01);
+	glTranslated(-7.5, 5, 0.01);
 	DrawWindow();
 	glPopMatrix();
 
 	glPushMatrix();
-	glTranslated(7.5, 10, 0.01);
+	glTranslated(7.5, 5, 0.01);
+	DrawWindow();
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslated(-7.5, 15, 0.01);
+	DrawWindow();
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslated(7.5, 15, 0.01);
 	DrawWindow();
 	glPopMatrix();
 
@@ -835,9 +859,9 @@ void idle() // WRITE OFFSETS IN THIS METHOD
 	speed = 0;
 	dy = 0;
 	dx = 0;
-	alpha += 0.001;
-	sunPositionX = cos(alpha)*cos(alpha)*100;
-	sunPositionY = sin(alpha)*sin(alpha)*100;
+	sun_alpha += 0.001;
+	sunPositionX = cos(sun_alpha)*cos(sun_alpha)*100;
+	sunPositionY = sin(sun_alpha)*sin(sun_alpha)*100;
 	// (8) PUT CONTENT HERE
 
 	glutPostRedisplay(); //-> display
