@@ -364,43 +364,78 @@ void DrawFront()
 	glPopMatrix();
 
 	glPushMatrix();
-	glTranslated(0, 0, 0.01);
-	DrawDoor();
-	glPopMatrix();
+		glTranslated(0, 0, 0.01);
+		DrawDoor();
+		glPopMatrix();
 	glColor3d(wallsColor.r, wallsColor.g, wallsColor.b);
 
 	// Left wing
 	glPushMatrix();
-	glTranslated(-25, 0, 0);
-	DrawWing();
+		glTranslated(-25, 0, 0);
+		DrawWing();
 	glPopMatrix();
 
 	// Right wing
 	glPushMatrix();
-	glTranslated(25, 0, 0);
-	DrawWing();
+		glTranslated(25, 0, 0);
+		DrawWing();
 	glPopMatrix();
 
 	// Pillars
 	glColor3d(wallsColor.r, wallsColor.g, wallsColor.b);
+
 	glPushMatrix();
-	glTranslated(-10, 1, 3);
+		glTranslated(-44, 1, 3);
+		DrawPillar();
+	glPopMatrix();
+
+	glPushMatrix();
+		glTranslated(-22, 1, 3);
+		DrawPillar();
+	glPopMatrix();
+
+	glPushMatrix();
+		glTranslated(-10, 1, 3);
+		DrawPillar();
+	glPopMatrix();
+
+	glPushMatrix();
+		glTranslated(10, 1, 3);
+		DrawPillar();
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslated(22, 1, 3);
 	DrawPillar();
 	glPopMatrix();
 
 	glPushMatrix();
-	glTranslated(10, 1, 3);
+	glTranslated(44, 1, 3);
 	DrawPillar();
 	glPopMatrix();
 }
 
-void DrawLeft()
+void DrawFullWall()
 {
+	glColor3d(wallsColor.r, wallsColor.g, wallsColor.b);
 	// Left wing
 	glPushMatrix();
-	glRotated(0, 1, 0, 90);
-	glTranslated(-25, 0, 0);
-	DrawWing();
+		glTranslated(-25, 0, 0);
+		DrawWing();
+	glPopMatrix();
+
+	// Center filler wall
+	glColor3d(wallsColor.r, wallsColor.g, wallsColor.b);
+	glPushMatrix();
+		glTranslated(0, 10, 0);
+		glScaled(5, 10, 1);
+		DrawSquare();
+	glPopMatrix();
+
+	// Right wing
+	glPushMatrix();
+		glTranslated(25, 0, 0);
+		DrawWing();
 	glPopMatrix();
 }
 
@@ -427,11 +462,35 @@ void DrawExterior()
 	glColor3d(wallsColor.r, wallsColor.g, wallsColor.b);
 	DrawFront();
 
+	// Right wall
+	glPushMatrix();
+		glTranslated(44, 0, -44);
+		glRotated(90, 0, 1, 0);
+		DrawFullWall();
+	glPopMatrix();
+
+	// Left wall
+	glPushMatrix();
+		glTranslated(-44, 0, -44);
+		glRotated(270, 0, 1, 0);
+		DrawFullWall();
+	glPopMatrix();
+
+	// Back wall
+	glPushMatrix();
+		glTranslated(0, 0, -88);
+		glRotated(180, 0, 1, 0);
+		DrawFullWall();
+	glPopMatrix();
+
+
 }
 void DrawHouse()
 {
-	// Exterior
-	DrawExterior();
+	glPushMatrix();
+		glTranslated(0, 0, 44);
+		DrawExterior();
+	glPopMatrix();
 
 }
 
