@@ -16,7 +16,7 @@ struct rgb {
 	double b;
 };
 
-const int GSIZE = 150;  			// size to paint the ground
+const int GSIZE = 200;  			// size to paint the ground
 const double PI = 4 * atan(1.0);  	// define PI
 									// (1) PUT  CONST HERE
 
@@ -435,7 +435,51 @@ void DrawHouse()
 
 }
 
+void drawTrees()
+{
+	int i;
+	for (i = 0; i < 6; i++)
+	{
+		glPushMatrix();
+		glRotated(0, 0, 1, 0);
+		glTranslated(-12, 0, 15+5*i);
+		glScaled(0.5, 2, 0.5);
+		drawTree();
+		glPopMatrix();
+	}
 
+	for (i = 0; i < 6; i++)
+	{
+		glPushMatrix();
+		glRotated(0, 0, 1, 0);
+		glTranslated(12, 0, 15 + 5 * i);
+		glScaled(0.5, 2, 0.5);
+		drawTree();
+		glPopMatrix();
+	}
+}
+void DrawSphere(int cylinderDensity, int density, int spaces, double startTop, double endBottom)
+// default: cylinderDensity = 80,density= 80,spaces = 1, startTop = -PI / 2,endBottom = PI / 2
+{
+	double beta;
+	double delta = PI / density;
+	int i;
+
+	for (beta = startTop, i = 0; beta<endBottom; beta += spaces*delta, i++)
+	{
+		glPushMatrix();
+		glRotated(0, 0, 1, 0);
+		glTranslated(0, sin(beta), 0);
+		glScaled(1, (sin(beta + delta) - sin(beta)), 1);
+		DrawCylinder(cylinderDensity, cos(beta + delta), cos(beta), 1, 0, 2 * PI);
+		glPopMatrix();
+	}
+}
+void drawRoof()
+{
+	glColor3d(1, 0, 0);
+	DrawCylinder(4,0,1,1,0,2*PI);
+}
 // addone to display
 void ShowAll()
 {
@@ -450,24 +494,24 @@ void ShowAll()
 	DrawHouse();
 
 	drawStairs(10);
+
 	glPushMatrix();
-		glRotated(0, 0, 1, 0);
-		glTranslated(-10, 0, 15);
-		glScaled(0.5, 2, 0.5);
-		drawTree();
+	glRotated(0, 0, 1, 0);
+	glTranslated(-20 * 3, 0, 20 * 2);
+	glScaled(3, 1, 3);
+	drawFence(40);
 	glPopMatrix();
+
+	drawTrees();
+
 	glPushMatrix();
-		glRotated(0, 0, 1, 0);
-		glTranslated(10, 0, 15);
-		glScaled(0.5, 2, 0.5);
-		drawTree();
-		glPopMatrix();
-	glPushMatrix();
-		glRotated(0, 0, 1, 0);
-		glTranslated(-20*3, 0, 20*2);
-		glScaled(3, 1, 3);
-		drawFence(40);
+	glTranslated(0, 20, -40);
+	glRotated(45, 0, 1, 0);
+	glScaled(65,20,65);
+	drawRoof();
 	glPopMatrix();
+	
+
 	
 }
 
