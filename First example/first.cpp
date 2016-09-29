@@ -1,7 +1,6 @@
-// All you need to the main body (3d graphics program)
-
-// add to project properties->configuration ->linker->input
-//->additional dependences-> opengl32.lib;glu32.lib;glut.lib;
+///////////////////////////////////////////////////////////////////////////
+//								House						    	     //
+///////////////////////////////////////////////////////////////////////////
 
 #include "GLUT.H"
 #include <math.h>
@@ -21,14 +20,15 @@ const int GSIZE = 200;  			// size to paint the ground
 const int TSIZE = 256;				// size of texture must be power of two
 
 const double PI = 4 * atan(1.0);  	// define PI
-									// (1) PUT  CONST HERE
 
-									// (2) PUT define HERE 
+// (1) PUT  CONST HERE
 
-									// (3) PUT GLOBAL varibles HERE 
-double eyex = 0, eyez = 85, eyey = 25; // camera - eye
+// (2) PUT define HERE 
+
+// (3) PUT GLOBAL varibles HERE 
+double eyex = 0, eyez = 85, eyey = 5; // camera - eye
 double dirx, diry, dirz;			// camera - look at
-double dx = 0, dy = 0, dz = 0; 				// change position 
+double dx = 0, dy = 0, dz = 0; 		// change position 
 double speed = 0;					// change position
 double angular_speed = 0;			// change position
 double sight = PI; 					// helps to calculate the change of position
@@ -49,6 +49,12 @@ double sunPositionX = 1;
 double sunPositionY = 1;
 GLfloat mat_shininess[] = { 200 };
 double sun_alpha = 0; // sun angle;
+
+
+double Normal3dv(double *v)
+{
+	return sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
+}
 
 
 void LoadBitmap(char *fname)
@@ -76,59 +82,58 @@ void SetTexture(int tx)
 	int i, j;
 	switch (tx)
 	{
-	case 0:
-		for (i = 0;i<TSIZE;i++)
-			for (j = 0;j<TSIZE;j++)
-			{
-				if (i % 64 >= 60 ||  // horizontal lines
-					(((i / 64) % 2 == 0) && (j / (TSIZE / 4) == 0 &&
-						j % (TSIZE / 4) >= TSIZE / 4 - 3 || j / (TSIZE / 4) == 2 &&
-						j % (TSIZE / 4) >= TSIZE / 4 - 3) || // 3 bricks
-						(((i / 64) % 2 == 1) && ((j % (TSIZE / 2) >= TSIZE / 2 - 3))))) // 2 bricks
+		case 0:
+			for (i = 0;i<TSIZE;i++)
+				for (j = 0;j<TSIZE;j++)
 				{
-					tx0[i][j][0] = 50; // red
-					tx0[i][j][1] = 50; // green
-					tx0[i][j][2] = 50; // blue
-					tx0[i][j][3] = 0;
+					if (i % 64 >= 60 ||  // horizontal lines
+						(((i / 64) % 2 == 0) && (j / (TSIZE / 4) == 0 &&
+							j % (TSIZE / 4) >= TSIZE / 4 - 3 || j / (TSIZE / 4) == 2 &&
+							j % (TSIZE / 4) >= TSIZE / 4 - 3) || // 3 bricks
+							(((i / 64) % 2 == 1) && ((j % (TSIZE / 2) >= TSIZE / 2 - 3))))) // 2 bricks
+					{
+						tx0[i][j][0] = 50; // red
+						tx0[i][j][1] = 50; // green
+						tx0[i][j][2] = 50; // blue
+						tx0[i][j][3] = 0;
+					}
+					else
+					{
+						tx0[i][j][0] = 200 + rand() % 55; // red
+						tx0[i][j][1] = 120 + rand() % 50; // green
+						tx0[i][j][2] = 0; // blue
+						tx0[i][j][3] = 0;
+					}
 				}
-				else
+			break;
+		case 1:
+		{
+			int k = 0;
+			for (i = 0;i < 256;i++)
+				for (j = 0;j < 512;j++, k += 3)
 				{
-					tx0[i][j][0] = 200 + rand() % 55; // red
-					tx0[i][j][1] = 120 + rand() % 50; // green
-					tx0[i][j][2] = 0; // blue
-					tx0[i][j][3] = 0;
+					tx1[i][j][0] = bmp[k + 2]; // red
+					tx1[i][j][1] = bmp[k + 1]; // green
+					tx1[i][j][2] = bmp[k]; // blue
+					tx1[i][j][3] = 0;
 				}
-			}
-		break;
-	case 1:
-	{
-		int k = 0;
-		for (i = 0;i < 256;i++)
-			for (j = 0;j < 512;j++, k += 3)
-			{
-				tx1[i][j][0] = bmp[k + 2]; // red
-				tx1[i][j][1] = bmp[k + 1]; // green
-				tx1[i][j][2] = bmp[k]; // blue
-				tx1[i][j][3] = 0;
-			}
-		break;
-	}
-	case 2:
-	{
-		int k = 0;
-		for (i = 0;i < 512;i++)
-			for (j = 0;j < 512;j++, k += 3)
-			{
-				tx2[i][j][0] = bmp[k + 2]; // red
-				tx2[i][j][1] = bmp[k + 1]; // green
-				tx2[i][j][2] = bmp[k]; // blue
-				tx2[i][j][3] = 0;
-			}
-		break;
-	}
+			break;
+		}
+		case 2:
+		{
+			int k = 0;
+			for (i = 0;i < 512;i++)
+				for (j = 0;j < 512;j++, k += 3)
+				{
+					tx2[i][j][0] = bmp[k + 2]; // red
+					tx2[i][j][1] = bmp[k + 1]; // green
+					tx2[i][j][2] = bmp[k]; // blue
+					tx2[i][j][3] = 0;
+				}
+			break;
+		}
 	}
 }
-
 
 void TextureDefintions()
 {
@@ -166,7 +171,6 @@ void init()
 {
 	int i, j;
 
-
 	// optional set random values
 	srand(time(0));
 
@@ -187,7 +191,6 @@ void init()
 
 void DrawGround()
 {
-
 	// draw Y axis
 	glColor3d(1, 0, 0);
 	glBegin(GL_LINES);
@@ -199,11 +202,11 @@ void DrawGround()
 
 	glColor3d(0.5, 1, 0.5);
 
-
 	for (i = 0; i<GSIZE - 1; i++)
 		for (j = 0; j<GSIZE - 1; j++)
 		{
 			glBegin(GL_POLYGON);// GL_LINE_LOOP);
+			glNormal3d(0, 1, 0);
 			glVertex3d(j - GSIZE / 2, 0, i - GSIZE / 2);
 			glVertex3d(j - GSIZE / 2, 0, i + 1 - GSIZE / 2);
 			glVertex3d(j + 1 - GSIZE / 2, 0, i + 1 - GSIZE / 2);
@@ -214,7 +217,6 @@ void DrawGround()
 
 // (5) PUT METHODS HERE
 
-
 void DrawCylinder(int n, double topr, double bottomr, int spaces, double startAngle, double endAngle)
 // sefault : n = 80(shrap), spaces = 1 (full cylinder), startAngle = 0, endAngle = 2*PI
 {
@@ -224,6 +226,7 @@ void DrawCylinder(int n, double topr, double bottomr, int spaces, double startAn
 	for (alpha = startAngle;alpha<endAngle;alpha += spaces*teta)
 	{
 		glBegin(GL_POLYGON);
+		glNormal3d(sin(alpha), 0, cos(alpha));
 		glVertex3d(topr*sin(alpha), 1, topr*cos(alpha));
 		glVertex3d(topr*sin(alpha + teta), 1, topr*cos(alpha + teta));
 		glVertex3d(bottomr*sin(alpha + teta), 0, bottomr*cos(alpha + teta));
@@ -232,8 +235,6 @@ void DrawCylinder(int n, double topr, double bottomr, int spaces, double startAn
 	}
 }
 
-
-// TODO: adjust
 void DrawTexCylinder(int n, int tn, int r, double startAngle, double endAngle)
 {
 	double alpha;
@@ -247,6 +248,7 @@ void DrawTexCylinder(int n, int tn, int r, double startAngle, double endAngle)
 	for (alpha = startAngle;alpha<endAngle;alpha += teta)
 	{
 		glBegin(GL_POLYGON);
+		glNormal3d(sin(alpha), 0, cos(alpha));
 		glTexCoord2d(0, teta);
 		glVertex3d(r*sin(alpha), 1, r*cos(alpha));
 		glTexCoord2d(teta, teta);
@@ -258,13 +260,67 @@ void DrawTexCylinder(int n, int tn, int r, double startAngle, double endAngle)
 		glEnd();
 	}
 	glDisable(GL_TEXTURE_2D);
-
 }
+
+void DrawTexCylinder1(int n, int tn, int r, double startAngle, double endAngle)
+{
+	double alpha;
+	double teta = 2 * PI / n;
+	int c;
+	double part = 1 / (double)n;
+
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, tn); // tn is texture number
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE); // GL_MODULATE to get lighting
+
+	for (alpha = startAngle, c = 0;alpha<endAngle;alpha += teta, c++)
+	{
+		glBegin(GL_POLYGON);
+		/*
+		glTexCoord2d(0, teta);
+		glVertex3d(r*sin(alpha), 1, r*cos(alpha));
+		glTexCoord2d(teta, teta);
+		glVertex3d(r*sin(alpha + teta), 1, r*cos(alpha + teta));
+		glTexCoord2d(teta, 0);
+		glVertex3d(r*sin(alpha + teta), -1, r*cos(alpha + teta));
+		glTexCoord2d(0, 0);
+		glVertex3d(r*sin(alpha), -1, r*cos(alpha));*/
+
+		glNormal3d(sin(alpha), 0, cos(alpha));
+		glTexCoord2d(c*part, 0);
+		glVertex3d(r*sin(alpha), 1, r*cos(alpha)); // 1
+		glTexCoord2d((c + 1)*part, 0);
+		glVertex3d(r*sin(alpha + teta), 1, r*cos(alpha + teta)); // 2
+	}
+
+	glTexCoord2d((c + 1)*part, 2);
+	glVertex3d(r*sin(alpha + teta), 0, r*cos(alpha + teta)); // 3
+
+	glTexCoord2d(c*part, 2);
+	glVertex3d(r*sin(alpha), 0, r*cos(alpha)); // 4
+	glEnd();
+	glDisable(GL_TEXTURE_2D);
+}
+
 
 void DrawCube()
 {
+
+	/*GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+	GLfloat mat_shininess[] = { 50.0 };
+	GLfloat light_position[] = { 1.0, 1.0, 1.0, 0.0 };
+	//glClearColor(0.0, 0.0, 0.0, 0.0);
+	//glShadeModel(GL_SMOOTH);
+
+	glMaterialfv(GL_FRONT_AND_BACK | GL_FRONT_FACE | GL_LEFT | GL_RIGHT, GL_SPECULAR, mat_specular);
+	glMaterialfv(GL_FRONT_AND_BACK | GL_FRONT_FACE | GL_LEFT | GL_RIGHT, GL_SHININESS, mat_shininess);
+	GLfloat mat_amb_diff[] = { 0.1, 0.5, 0.8, 1.0 };
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE,
+		mat_amb_diff);
+		*/
 	// top
 	glBegin(GL_POLYGON);
+	glNormal3d(0,1,0);
 	glVertex3d(-1, 1, 1);
 	glVertex3d(1, 1, 1);
 	glVertex3d(1, 1, -1);
@@ -272,6 +328,7 @@ void DrawCube()
 	glEnd();
 	// top
 	glBegin(GL_POLYGON);
+	glNormal3d(0, -1, 0);
 	glVertex3d(-1, -1, 1);
 	glVertex3d(1, -1, 1);
 	glVertex3d(1, -1, -1);
@@ -279,6 +336,7 @@ void DrawCube()
 	glEnd();
 	// front
 	glBegin(GL_POLYGON);
+	glNormal3d(0, 0, 1);
 	glVertex3d(-1, 1, 1);
 	glVertex3d(1, 1, 1);
 	glVertex3d(1, -1, 1);
@@ -286,6 +344,7 @@ void DrawCube()
 	glEnd();
 	// back
 	glBegin(GL_POLYGON);
+	glNormal3d(0, 0, -1);
 	glVertex3d(1, 1, -1);
 	glVertex3d(1, -1, -1);
 	glVertex3d(-1, -1, -1);
@@ -293,6 +352,7 @@ void DrawCube()
 	glEnd();
 	// left
 	glBegin(GL_POLYGON);
+	glNormal3d(-1, 0, 0);
 	glVertex3d(-1, 1, 1);
 	glVertex3d(-1, 1, -1);
 	glVertex3d(-1, -1, -1);
@@ -300,12 +360,109 @@ void DrawCube()
 	glEnd();
 	// right
 	glBegin(GL_POLYGON);
+	glNormal3d(1, 0, 0);
 	glVertex3d(1, 1, 1);
 	glVertex3d(1, 1, -1);
 	glVertex3d(1, -1, -1);
 	glVertex3d(1, -1, 1);
 	glEnd();
 }
+
+void DrawSphere(int cylinderDensity, int density, int spaces, double startTop, double endBottom)
+// default: cylinderDensity = 80,density= 80,spaces = 1, startTop = -PI / 2,endBottom = PI / 2
+{
+	double beta;
+	double delta = PI / density;
+	int i;
+
+	for (beta = startTop, i = 0; beta<endBottom; beta += spaces*delta, i++)
+	{
+		glPushMatrix();
+		glRotated(0, 0, 1, 0);
+		glTranslated(0, sin(beta), 0);
+		glScaled(1, (sin(beta + delta) - sin(beta)), 1);
+		DrawCylinder(cylinderDensity, cos(beta + delta), cos(beta), 1, 0, 2 * PI);
+		glPopMatrix();
+	}
+}
+
+void addLight()
+{
+	GLfloat light_position[] = { 40,sunPositionX,sunPositionY, 0 };
+
+
+	///////////// BARR
+	glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
+
+	//////////////// OMER
+	glEnable(GL_COLOR_MATERIAL); // to save the original color of the object
+	glShadeModel(GL_SMOOTH);
+	glMaterialfv(GL_FRONT_AND_BACK | GL_FRONT_FACE | GL_LEFT | GL_RIGHT, GL_SHININESS, mat_shininess);
+	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+	glEnable(GL_DEPTH_TEST);
+}
+
+//draw sun
+void drawSun()
+{
+	glDisable(GL_LIGHTING);
+	glColor3d(1, 1, 0);
+	glPushMatrix();
+	glRotated(0, 0, 1, 0);
+	glTranslated(sunPositionX, sunPositionY, 0);
+	glScaled(10, 10, 10);
+	DrawSphere(80, 80, 1, -PI / 2, PI / 2);
+	glPopMatrix();
+	glEnable(GL_LIGHTING);
+}
+
+void DrawLightBulb(double x, double y, double z, GLenum light)
+{
+	// Create light components
+	GLfloat ambientLight[] = { 0.2, 0.2, 0.2, 1.0 };
+	GLfloat diffuseLight[] = { 0.8, 0.8, 0.8, 1.0 };
+	GLfloat specularLight[] = { 1.0, 1.0, 1.0, 1.0f };
+	GLfloat position[] = { x, y, z, 1.0 };
+
+	// Assign created components to GL_LIGHT0
+	//glLightfv(light, GL_AMBIENT, ambientLight);
+	glLightfv(light, GL_DIFFUSE, diffuseLight);
+	//glLightfv(light, GL_SPECULAR, specularLight);
+	glLightfv(light, GL_POSITION, position);
+
+	glDisable(GL_LIGHTING);
+	glColor3d(1, 1, 0);
+	glPushMatrix();
+	//glRotated(0, 0, 1, 0);
+	glTranslated(x, y, z);
+	glScaled(0.25, 0.25, 0.25);
+	DrawSphere(60, 60, 1, -PI / 2, PI / 2);
+	glPopMatrix();
+
+	/*
+	// GL_LIGHT1: the red light emitting light source
+	// Create light components for GL_LIGHT1
+	float ambientLight1[] = { 1.0f, 0.5f, 0.5f, 1.0f };
+	float diffuseLight1[] = { 1.0f, 0.5f, 0.5f, 1.0f };
+	float specularLight1[] = { 1.0f, 0.5f, 0.5f, 1.0f };
+	float position1[] = { 1.5f, 1.0f, -4.0f, 1.0f };
+	// Assign created components to GL_LIGHT1
+	glLightfv(GL_LIGHT1, GL_AMBIENT, ambientLight1);
+	glLightfv(GL_LIGHT1, GL_DIFFUSE, diffuseLight1);
+	glLightfv(GL_LIGHT1, GL_SPECULAR, specularLight1);
+	glLightfv(GL_LIGHT1, GL_POSITION, position1);
+	*/
+	glEnable(GL_LIGHTING);
+	glEnable(light);
+	glEnable(GL_COLOR_MATERIAL);
+	// set material properties which will be assigned by glColor
+	glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
+
+}
+
 void drawTree()
 {
 	// draw trunk
@@ -355,8 +512,6 @@ void drawFence(int disatnce)
 	DrawCube();
 	glPopMatrix();
 
-
-
 	// draw pillar 3
 	glColor3d(0.54, 0.27, 0.07);
 	glPushMatrix();
@@ -366,7 +521,6 @@ void drawFence(int disatnce)
 	DrawCylinder(80, 2, 2, 1, 0, 2 * PI);
 	glPopMatrix();
 
-
 	// draw wall betweem pillar 2 -3
 	glColor3d(0.54, 0.27, 0.07);
 	glPushMatrix();
@@ -375,7 +529,6 @@ void drawFence(int disatnce)
 	glScaled(-disatnce / 2, 3, 0.1);
 	DrawCube();
 	glPopMatrix();
-
 
 	// draw pillar 4
 	glColor3d(0.54, 0.27, 0.07);
@@ -420,16 +573,15 @@ void drawFence(int disatnce)
 	glScaled(3, 0.1, disatnce / 4);
 	DrawCube();
 	glPopMatrix();
-
-
 }
 void DrawSquare()
 {
 	glBegin(GL_POLYGON);
-	glVertex3d(-1, 1, 1);
-	glVertex3d(1, 1, 1);
-	glVertex3d(1, -1, 1);
-	glVertex3d(-1, -1, 1);
+		glNormal3d(0,0,0);
+		glVertex3d(-1, 1, 0);
+		glVertex3d(1, 1, 0);
+		glVertex3d(1, -1, 0);
+		glVertex3d(-1, -1, 0);
 	glEnd();
 }
 
@@ -440,11 +592,9 @@ void DrawWindow()
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE,
 		GL_MODULATE); // GL_MODULATE to get lighting
 
-	//glColor3d(1, 0, 0);
-	// TODO: put texture
 	glPushMatrix();
-	//glScaled(3, 3, 1);
 	glBegin(GL_POLYGON);
+	glNormal3d(0, 0, -1);
 	glTexCoord2d(0, 1);
 	glVertex3d(-2, 2, 1);
 	glTexCoord2d(1, 1);
@@ -457,42 +607,57 @@ void DrawWindow()
 	glPopMatrix();
 }
 
-
-
 void DrawDoor()
 {
 	glColor3d(1, 0, 0);
-	// TODO: put texture
 	glPushMatrix();
 	glTranslated(0, 3.0, 0.1);
 	glScaled(1, 3, 1);
 	DrawTexCylinder(30, 2, 5, -0.1*PI, 0.1*PI);
-	//DrawCylinder(60, 5, 5, 1, -0.2*PI, 0.2*PI);
 	glPopMatrix();
 }
 
 void DrawPillar()
 {
 	glColor3d(wallsColor.r - 0.2, wallsColor.g - 0.2, wallsColor.b - 0.2);
+	GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+	GLfloat mat_shininess[] = { 50.0 };
+	GLfloat mat_amb_diff[] = { wallsColor.r - 0.1, wallsColor.g - 0.1, wallsColor.b - 0.1, 1.0 };
+	
+	//GLfloat mat_amb_diff[] = { 0.1, 0.5, 0.8, 1.0 };
+	glMaterialfv(GL_FRONT| GL_FRONT_FACE | GL_LEFT | GL_RIGHT, GL_SPECULAR, mat_specular);
+	glMaterialfv(GL_FRONT| GL_FRONT_FACE | GL_LEFT | GL_RIGHT, GL_SHININESS, mat_shininess);
+	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff);
+
 
 	// Bottom
-
 	glPushMatrix();
 	glScaled(1.75, 0.5, 1.75);
 	DrawCube();
 	glPopMatrix();
 
 	glPushMatrix();
-	glTranslated(0, 1, 0);
 	glScaled(1.5, 1, 1.5);
 	DrawCylinder(60, 1, 1, 1, 0, 2 * PI);
 	glPopMatrix();
 
+	glPushMatrix();
+	glTranslated(0, 1, 0);
+	glScaled(1.5, 0, 1.5);
+	glutSolidSphere(1, 60, 60);
+	glPopMatrix();
+
 	// Body
 	glPushMatrix();
-	glTranslated(0, 2, 0);
-	glScaled(1, 16, 1);
+	glTranslated(0, 1, 0);
+	glScaled(1, 17, 1);
 	DrawCylinder(60, 1, 1, 1, 0, 2 * PI);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslated(0, 18, 0);
+	glScaled(1.5, 0, 1.5);
+	glutSolidSphere(1, 60, 60);
 	glPopMatrix();
 
 	// Top
@@ -509,16 +674,8 @@ void DrawPillar()
 	glPopMatrix();
 }
 
-void DrawWing()
+void DrawWindowpane()
 {
-	// Wall
-	glColor3d(wallsColor.r, wallsColor.g, wallsColor.b);
-	glPushMatrix();
-	glTranslated(0, 10, 0);
-	glScaled(20, 10, 1);
-	DrawSquare();
-	glPopMatrix();
-
 	// Windows
 	glPushMatrix();
 	glTranslated(-7.5, 5, 0.01);
@@ -539,7 +696,18 @@ void DrawWing()
 	glTranslated(7.5, 15, 0.01);
 	DrawWindow();
 	glPopMatrix();
+}
+void DrawWing()
+{
+	// Wall
+	glColor3d(wallsColor.r, wallsColor.g, wallsColor.b);
+	glPushMatrix();
+		glTranslated(0, 10, 0);
+		glScaled(20, 10, 0.5);
+		DrawCube();
+	glPopMatrix();
 
+	DrawWindowpane();
 }
 
 void DrawFront()
@@ -598,12 +766,12 @@ void DrawFront()
 	glPopMatrix();
 
 	glPushMatrix();
-	glTranslated(38, 0.5, 3);
-	DrawPillar();
+		glTranslated(38, 0.5, 3);
+		DrawPillar();
 	glPopMatrix();
 }
 
-void DrawFullWall()
+void ExteriorWall()
 {
 	glColor3d(wallsColor.r, wallsColor.g, wallsColor.b);
 	// Left wing
@@ -616,9 +784,11 @@ void DrawFullWall()
 	glColor3d(wallsColor.r, wallsColor.g, wallsColor.b);
 	glPushMatrix();
 		glTranslated(0, 10, 0);
-		glScaled(5, 10, 1);
-		DrawSquare();
+		glScaled(5, 10, 0.5);
+		DrawCube();
 	glPopMatrix();
+
+	DrawWindowpane();
 
 	// Right wing
 	glPushMatrix();
@@ -627,11 +797,43 @@ void DrawFullWall()
 	glPopMatrix();
 }
 
+void RoomEntrance()
+{
+	// Wall
+	glColor3d(wallsColor.r, wallsColor.g, wallsColor.b);
+	glPushMatrix();
+	glScaled(4, 5, 0.5);
+	DrawCube();
+	glPopMatrix();
+
+	// Door
+	glPushMatrix();
+	glTranslated(6, 3, 0);
+	glScaled(2, 2, 0.5);
+	DrawCube();
+	glPopMatrix();
+
+	// Wall
+	glPushMatrix();
+	glTranslated(12, 0, 0);
+	glScaled(4, 5, 0.5);
+	DrawCube();
+	glPopMatrix();
+}
+
+void RoomWall()
+{
+	// Wall
+	glColor3d(wallsColor.r, wallsColor.g, wallsColor.b);
+	glPushMatrix();
+		glScaled(10, 5, 0.5);
+		DrawCube();
+	glPopMatrix();
+}
 
 void drawStairsLevel(int posX, int posY, int posZ)
 {
 	glPushMatrix();
-	glRotated(0, 0, 1, 0);
 	glTranslated(posX, posY, posZ);
 	glScaled(4, 1, 1);
 	glColor3d(wallsColor.r, wallsColor.g, wallsColor.b); // choose color
@@ -650,51 +852,6 @@ void drawRoof()
 {
 	glColor3d(1, 0, 0);
 	DrawCylinder(4, 0, 1, 1, 0, 2 * PI);
-}
-
-void DrawExterior()
-{
-	glColor3d(wallsColor.r, wallsColor.g, wallsColor.b);
-	DrawFront();
-
-	// Right wall
-	glPushMatrix();
-		glTranslated(44, 0, -44);
-		glRotated(90, 0, 1, 0);
-		DrawFullWall();
-	glPopMatrix();
-
-	// Left wall
-	glPushMatrix();
-		glTranslated(-44, 0, -44);
-		glRotated(270, 0, 1, 0);
-		DrawFullWall();
-	glPopMatrix();
-
-	// Back wall
-	glPushMatrix();
-		glTranslated(0, 0, -88);
-		glRotated(180, 0, 1, 0);
-		DrawFullWall();
-	glPopMatrix();
-
-	//draw roof
-	glPushMatrix();
-	glTranslated(0, 20, -42);
-	glRotated(45, 0, 1, 0);
-	glScaled(70, 20, 70);
-	drawRoof();
-	glPopMatrix();
-
-
-}
-void DrawHouse()
-{
-	glPushMatrix();
-		glTranslated(0, 0, 44);
-		DrawExterior();
-	glPopMatrix();
-
 }
 
 void drawTrees()
@@ -720,108 +877,242 @@ void drawTrees()
 		glPopMatrix();
 	}
 }
-void DrawSphere(int cylinderDensity, int density, int spaces, double startTop, double endBottom)
-// default: cylinderDensity = 80,density= 80,spaces = 1, startTop = -PI / 2,endBottom = PI / 2
-{
-	double beta;
-	double delta = PI / density;
-	int i;
-
-	for (beta = startTop, i = 0; beta<endBottom; beta += spaces*delta, i++)
-	{
-		glPushMatrix();
-		glRotated(0, 0, 1, 0);
-		glTranslated(0, sin(beta), 0);
-		glScaled(1, (sin(beta + delta) - sin(beta)), 1);
-		DrawCylinder(cylinderDensity, cos(beta + delta), cos(beta), 1, 0, 2 * PI);
-		glPopMatrix();
-	}
-}
-
 
 // draw floors
 void drawFloors()
 {
 	glColor3d(floorColor.r, floorColor.g, floorColor.b);
-glPushMatrix();
-glRotated(0, 0, 1, 0);
-glTranslated(0,0.1,0);
-glScaled(44,0.1, 44);
-DrawCube();
-glPopMatrix();
+	glPushMatrix();
+	glRotated(0, 0, 1, 0);
+	glTranslated(0,0.1,0);
+	glScaled(44,0.1, 44);
+	DrawCube();
+	glPopMatrix();
 
-glColor3d(floorColor.r, floorColor.g, floorColor.b);
-glPushMatrix();
-glRotated(0, 0, 1, 0);
-glTranslated(0, 10, 0);
-glScaled(44, 0.1, 44);
-DrawCube();
-glPopMatrix();
+	glColor3d(floorColor.r, floorColor.g, floorColor.b);
+	glPushMatrix();
+	glRotated(0, 0, 1, 0);
+	glTranslated(0, 10, 0);
+	glScaled(44, 0.1, 44);
+	DrawCube();
+	glPopMatrix();
 }
+
+void DrawExterior()
+{
+	glColor3d(wallsColor.r, wallsColor.g, wallsColor.b);
+	DrawFront();
+
+	// Right wall
+	glPushMatrix();
+		glTranslated(45, 0, -45);
+		glRotated(90, 0, 1, 0);
+		ExteriorWall();
+	glPopMatrix();
+
+	// Left wall
+	glPushMatrix();
+		glTranslated(-45, 0, -45);
+		glRotated(270, 0, 1, 0);
+		ExteriorWall();
+	glPopMatrix();
+
+	// Back wall
+	glPushMatrix();
+		glTranslated(0, 0, -90);
+		glRotated(180, 0, 1, 0);
+		ExteriorWall();
+	glPopMatrix();
+
+	//draw roof
+	glPushMatrix();
+		glTranslated(0, 20, -40);
+		glRotated(45, 0, 1, 0);
+		glScaled(70, 20, 70);
+		drawRoof();
+	glPopMatrix();
+}
+
+void DrawRooms()
+{
+	glColor3d(wallsColor.r, wallsColor.g, wallsColor.b);
+	glPushMatrix();
+	glTranslated(5, 5, -4);
+	glRotated(90, 0, 1, 0);
+	RoomEntrance();
+	glPopMatrix();
+
+	glColor3d(wallsColor.r, wallsColor.g, wallsColor.b);
+	glPushMatrix();
+	glTranslated(15, 5, -20);
+	RoomWall();
+	glPopMatrix();
+
+	glColor3d(wallsColor.r, wallsColor.g, wallsColor.b);
+	glPushMatrix();
+	glTranslated(24, 5, -4);
+	glRotated(90, 0, 1, 0);
+	RoomEntrance();
+	glPopMatrix();
+
+	glColor3d(wallsColor.r, wallsColor.g, wallsColor.b);
+	glPushMatrix();
+	glTranslated(29, 5, -20);
+		RoomEntrance();
+	glPopMatrix();
+}
+void DrawInterior()
+{/*
+	// Draw Second floor
+	glColor3d(wallsColor.r, wallsColor.g, wallsColor.b);
+	glPushMatrix();
+		glTranslated(0, 10, -44);
+		glRotated(90, 1, 0, 0);
+		glScaled(44, 44, 1);
+		DrawSquare();
+	glPopMatrix();
+	*/
+	
+	// First Row
+	/*
+	glColor3d(wallsColor.r, wallsColor.g, wallsColor.b);
+	glPushMatrix();
+		glTranslated(5, 5, -4);
+		glRotated(90, 0, 1, 0);
+		RoomEntrance();
+	glPopMatrix();
+
+	glColor3d(wallsColor.r, wallsColor.g, wallsColor.b);
+	glPushMatrix();
+	glTranslated(15, 5, -20);
+	RoomWall();
+	glPopMatrix();
+
+	glColor3d(wallsColor.r, wallsColor.g, wallsColor.b);
+	glPushMatrix();
+	glTranslated(24, 5, -4);
+	glRotated(90, 0, 1, 0);
+	RoomEntrance();
+	glPopMatrix();
+
+	glColor3d(wallsColor.r, wallsColor.g, wallsColor.b);
+	glPushMatrix();
+	glTranslated(30, 5, -20);
+	RoomEntrance();
+	glPopMatrix();
+	*/
+
+	DrawRooms();
+	glPushMatrix();
+	glScaled(-1, 1, 1);
+		DrawRooms();
+	glPopMatrix();
+
+	glPushMatrix();
+		glTranslated(0,0,-20);
+		DrawRooms();
+		glPushMatrix();
+			glScaled(-1, 1, 1);
+			DrawRooms();
+		glPopMatrix();
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslated(0, 0, -40);
+	DrawRooms();
+	glPushMatrix();
+	glScaled(-1, 1, 1);
+	DrawRooms();
+	glPopMatrix();
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslated(0, 0, -60);
+	DrawRooms();
+	glPushMatrix();
+	glScaled(-1, 1, 1);
+	DrawRooms();
+	glPopMatrix();
+	glPopMatrix();
+
+	/*
+	glColor3d(wallsColor.r, wallsColor.g, wallsColor.b);
+		glPushMatrix();
+		glTranslated(-5, 5, -4);
+		glRotated(90, 0, 1, 0);
+		RoomEntrance();
+	glPopMatrix();
+
+	glColor3d(wallsColor.r, wallsColor.g, wallsColor.b);
+	glPushMatrix();
+		glTranslated(-15, 5, -20);
+		RoomWall();
+	glPopMatrix();
+
+	glColor3d(wallsColor.r, wallsColor.g, wallsColor.b);
+	glPushMatrix();
+		glTranslated(-24, 5, -4);
+		glRotated(90, 0, 1, 0);
+		RoomEntrance();
+	glPopMatrix();
+
+	glColor3d(wallsColor.r, wallsColor.g, wallsColor.b);
+	glPushMatrix();
+		glTranslated(-40, 5, -20);
+		RoomEntrance();
+	glPopMatrix();
+	*/
+}
+
+void DrawHouse()
+{
+	glPushMatrix();
+	glTranslated(0, 0, 44);
+	DrawExterior();
+	DrawInterior();
+	glPopMatrix();
+
+	glPushMatrix();
+	glRotated(180, 0, 1, 0);
+	glTranslated(0, 0, -40);
+	drawStairs(10);
+	glPopMatrix();
+
+	drawFloors();
+
+	//DrawLightBulb(0, 9.0, 1.0, GL_LIGHT1);
+
+	//DrawLightBulb(-10, 9.0, 25.0, GL_LIGHT2);
+
+}
+
+void DrawGarden()
+{
+	glPushMatrix();
+		glRotated(0, 0, 1, 0);
+		glTranslated(-20 * 3, 0, 20 * 3.5);
+		glScaled(3, 1, 3);
+		drawFence(40);
+	glPopMatrix();
+
+	drawTrees();
+}
+
 // addone to display
 void ShowAll()
 {
 	glEnable(GL_DEPTH_TEST);
 	// start of the transformations
 	glMatrixMode(GL_MODELVIEW);
+	
 	glLoadIdentity();
 
 	DrawGround();
-	// (6) PUT CONTENT HERE
-
+	
 	DrawHouse();
 
-	
-
-	glPushMatrix();
-	glRotated(0, 0, 1, 0);
-	glTranslated(-20 * 3, 0, 20 * 3.5);
-	glScaled(3, 1, 3);
-	drawFence(40);
-	glPopMatrix();
-
-	glPushMatrix();
-	glRotated(180, 0, 1, 0);
-	glTranslated(0, 0, 0);
-	drawStairs(10);
-	glPopMatrix();
-
-	drawTrees();
-	
-	drawFloors();
-
+	DrawGarden();
 }
-
-
-void addLight()
-{
-	GLfloat light_position[] = { 40,sunPositionY,sunPositionX, 0 };
-
-	glEnable(GL_COLOR_MATERIAL); // to save the original color ov the object
-	glShadeModel(GL_SMOOTH);
-	glMaterialfv(GL_FRONT_AND_BACK|GL_FRONT_FACE|GL_LEFT|GL_RIGHT, GL_SHININESS, mat_shininess);
-	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
-	glEnable(GL_DEPTH_TEST);
-	
-}
-
-//draw sun
-void drawSun()
-{
-	glDisable(GL_LIGHTING);
-	glColor3d(1, 1, 0);
-	glPushMatrix();
-	glRotated(0, 0, 1, 0);
-	glTranslated(sunPositionY, sunPositionX, 1);
-	glScaled(10, 10, 10);
-	DrawSphere(80, 80, 1, -PI / 2, PI / 2);
-	glPopMatrix();
-	glEnable(GL_LIGHTING);
-}
-
 
 // refresh
 void display()
@@ -837,8 +1128,6 @@ void display()
 	drawSun();
 	addLight();
 	ShowAll();
-
-	// (7) PUT CONTENT HERE
 
 	glEnable(GL_DEPTH_TEST); // Return back to 3d 
 	glutSwapBuffers();
@@ -860,8 +1149,9 @@ void idle() // WRITE OFFSETS IN THIS METHOD
 	dy = 0;
 	dx = 0;
 	sun_alpha += 0.001;
-	sunPositionX = cos(sun_alpha)*cos(sun_alpha)*100;
-	sunPositionY = sin(sun_alpha)*sin(sun_alpha)*100;
+	sunPositionY = cos(sun_alpha)*cos(sun_alpha)*100;
+	sunPositionX = sin(sun_alpha)*sin(sun_alpha)*100;
+
 	// (8) PUT CONTENT HERE
 
 	glutPostRedisplay(); //-> display
@@ -878,7 +1168,6 @@ void mouse(int button, int state, int x, int y)
 	{
 		//(10) mouse right click
 	}
-
 }
 
 // keyboard regular
@@ -925,7 +1214,6 @@ void special(int key, int x, int y)
 		break;
 		// (12) add here
 	}
-
 }
 
 void main(int argc, char* argv[])
@@ -946,8 +1234,8 @@ void main(int argc, char* argv[])
 	glutKeyboardFunc(keyboard); // for ascii keys
 	glutSpecialFunc(special); // for special keys
 
-							  // (13) CALL TO NEW METHOD HERE (like menu)
-
+	// (13) CALL TO NEW METHOD HERE (like menu)
+	
 	init();
 
 	glutMainLoop();
