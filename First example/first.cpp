@@ -50,7 +50,6 @@ double sunPositionY = 1;
 GLfloat mat_shininess[] = { 200 };
 double sun_alpha = 0; // sun angle;
 
-
 double Normal3dv(double *v)
 {
 	return sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
@@ -194,8 +193,9 @@ void DrawGround()
 	// draw Y axis
 	glColor3d(1, 0, 0);
 	glBegin(GL_LINES);
-	glVertex3d(0, 0, 0);
-	glVertex3d(0, 4, 0);
+		//glNormal3d(0, 1, 0);
+		glVertex3d(0, 0, 0);
+		glVertex3d(0, 4, 0);
 	glEnd();
 
 	int i, j;
@@ -206,7 +206,7 @@ void DrawGround()
 		for (j = 0; j<GSIZE - 1; j++)
 		{
 			glBegin(GL_POLYGON);// GL_LINE_LOOP);
-			glNormal3d(0, 1, 0);
+			//glNormal3d(0, 1, 0);
 			glVertex3d(j - GSIZE / 2, 0, i - GSIZE / 2);
 			glVertex3d(j - GSIZE / 2, 0, i + 1 - GSIZE / 2);
 			glVertex3d(j + 1 - GSIZE / 2, 0, i + 1 - GSIZE / 2);
@@ -835,7 +835,7 @@ void drawStairsLevel(int posX, int posY, int posZ)
 {
 	glPushMatrix();
 	glTranslated(posX, posY, posZ);
-	glScaled(4, 1, 1);
+	glScaled(5, 1, 1);
 	glColor3d(wallsColor.r, wallsColor.g, wallsColor.b); // choose color
 	DrawCube();
 	glPopMatrix();;
@@ -878,23 +878,59 @@ void drawTrees()
 	}
 }
 
+void SecondFloor()
+{
+	glPushMatrix();
+		glTranslated(0, 10, 10);
+		glScaled(45, 0.1, 34);  /*44*/
+		DrawCube();
+	glPopMatrix();
+
+	glPushMatrix();
+		glTranslated(-25, 10, -21);
+		glScaled(20, 0.1, 15);
+		DrawCube();
+	glPopMatrix();
+
+	glPushMatrix();
+		glTranslated(25, 10, -21);
+		glScaled(20, 0.1, 15);
+		DrawCube();
+	glPopMatrix();
+
+
+	glPushMatrix();
+	glTranslated(-5, 10, -33);
+	glScaled(10, 0.1, 3.5);
+	DrawCube();
+	glPopMatrix();
+}
+
+
 // draw floors
-void drawFloors()
+void DrawFloors()
 {
 	glColor3d(floorColor.r, floorColor.g, floorColor.b);
 	glPushMatrix();
-	glRotated(0, 0, 1, 0);
 	glTranslated(0,0.1,0);
 	glScaled(44,0.1, 44);
 	DrawCube();
 	glPopMatrix();
 
 	glColor3d(floorColor.r, floorColor.g, floorColor.b);
+	SecondFloor();
+
+	glColor3d(floorColor.r, floorColor.g, floorColor.b);
 	glPushMatrix();
-	glRotated(0, 0, 1, 0);
-	glTranslated(0, 10, 0);
+	glTranslated(0, 20, 0);
 	glScaled(44, 0.1, 44);
 	DrawCube();
+	glPopMatrix();
+
+	glPushMatrix();
+		glRotated(180, 0, 1, 0);
+		glTranslated(0, 0, 20);
+		drawStairs(10);
 	glPopMatrix();
 }
 
@@ -919,7 +955,7 @@ void DrawExterior()
 
 	// Back wall
 	glPushMatrix();
-		glTranslated(0, 0, -90);
+		glTranslated(0, 0, -80);
 		glRotated(180, 0, 1, 0);
 		ExteriorWall();
 	glPopMatrix();
@@ -961,47 +997,8 @@ void DrawRooms()
 		RoomEntrance();
 	glPopMatrix();
 }
-void DrawInterior()
-{/*
-	// Draw Second floor
-	glColor3d(wallsColor.r, wallsColor.g, wallsColor.b);
-	glPushMatrix();
-		glTranslated(0, 10, -44);
-		glRotated(90, 1, 0, 0);
-		glScaled(44, 44, 1);
-		DrawSquare();
-	glPopMatrix();
-	*/
-	
-	// First Row
-	/*
-	glColor3d(wallsColor.r, wallsColor.g, wallsColor.b);
-	glPushMatrix();
-		glTranslated(5, 5, -4);
-		glRotated(90, 0, 1, 0);
-		RoomEntrance();
-	glPopMatrix();
-
-	glColor3d(wallsColor.r, wallsColor.g, wallsColor.b);
-	glPushMatrix();
-	glTranslated(15, 5, -20);
-	RoomWall();
-	glPopMatrix();
-
-	glColor3d(wallsColor.r, wallsColor.g, wallsColor.b);
-	glPushMatrix();
-	glTranslated(24, 5, -4);
-	glRotated(90, 0, 1, 0);
-	RoomEntrance();
-	glPopMatrix();
-
-	glColor3d(wallsColor.r, wallsColor.g, wallsColor.b);
-	glPushMatrix();
-	glTranslated(30, 5, -20);
-	RoomEntrance();
-	glPopMatrix();
-	*/
-
+void FirstLevel()
+{
 	DrawRooms();
 	glPushMatrix();
 	glScaled(-1, 1, 1);
@@ -1034,34 +1031,17 @@ void DrawInterior()
 	DrawRooms();
 	glPopMatrix();
 	glPopMatrix();
+}
 
-	/*
-	glColor3d(wallsColor.r, wallsColor.g, wallsColor.b);
-		glPushMatrix();
-		glTranslated(-5, 5, -4);
-		glRotated(90, 0, 1, 0);
-		RoomEntrance();
-	glPopMatrix();
+void DrawInterior()
+{
+	
 
-	glColor3d(wallsColor.r, wallsColor.g, wallsColor.b);
+	FirstLevel();
 	glPushMatrix();
-		glTranslated(-15, 5, -20);
-		RoomWall();
+	glTranslated(0, 10, 0);
+	FirstLevel();
 	glPopMatrix();
-
-	glColor3d(wallsColor.r, wallsColor.g, wallsColor.b);
-	glPushMatrix();
-		glTranslated(-24, 5, -4);
-		glRotated(90, 0, 1, 0);
-		RoomEntrance();
-	glPopMatrix();
-
-	glColor3d(wallsColor.r, wallsColor.g, wallsColor.b);
-	glPushMatrix();
-		glTranslated(-40, 5, -20);
-		RoomEntrance();
-	glPopMatrix();
-	*/
 }
 
 void DrawHouse()
@@ -1072,13 +1052,8 @@ void DrawHouse()
 	DrawInterior();
 	glPopMatrix();
 
-	glPushMatrix();
-	glRotated(180, 0, 1, 0);
-	glTranslated(0, 0, -40);
-	drawStairs(10);
-	glPopMatrix();
-
-	drawFloors();
+	DrawFloors();
+	//DrawInterior();
 
 	//DrawLightBulb(0, 9.0, 1.0, GL_LIGHT1);
 
