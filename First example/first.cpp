@@ -50,12 +50,6 @@ double sunPositionY = 1;
 GLfloat mat_shininess[] = { 200 };
 double sun_alpha = 0; // sun angle;
 
-double Normal3dv(double *v)
-{
-	return sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
-}
-
-
 void LoadBitmap(char *fname)
 {
 	FILE* pf;
@@ -188,14 +182,6 @@ void init()
 
 void DrawGround()
 {
-	// draw Y axis
-	glColor3d(1, 0, 0);
-	glBegin(GL_LINES);
-		//glNormal3d(0, 1, 0);
-		glVertex3d(0, 0, 0);
-		glVertex3d(0, 4, 0);
-	glEnd();
-
 	int i, j;
 
 	glColor3d(0.5, 1, 0.5);
@@ -203,8 +189,7 @@ void DrawGround()
 	for (i = 0; i<GSIZE - 1; i++)
 		for (j = 0; j<GSIZE - 1; j++)
 		{
-			glBegin(GL_POLYGON);// GL_LINE_LOOP);
-			//glNormal3d(0, 1, 0);
+			glBegin(GL_POLYGON);
 			glVertex3d(j - GSIZE / 2, 0, i - GSIZE / 2);
 			glVertex3d(j - GSIZE / 2, 0, i + 1 - GSIZE / 2);
 			glVertex3d(j + 1 - GSIZE / 2, 0, i + 1 - GSIZE / 2);
@@ -212,8 +197,6 @@ void DrawGround()
 			glEnd();
 		}
 }
-
-// (5) PUT METHODS HERE
 
 void DrawCylinder(int n, double topr, double bottomr, int spaces, double startAngle, double endAngle)
 // sefault : n = 80(shrap), spaces = 1 (full cylinder), startAngle = 0, endAngle = 2*PI
@@ -402,18 +385,15 @@ void DrawLightBulb(double x, double y, double z, GLenum light)
 	GLfloat position[] = { x, y, z, 1.0 };
 
 	// Assign created components to GL_LIGHT0
-	//glLightfv(light, GL_AMBIENT, ambientLight);
 	glLightfv(light, GL_DIFFUSE, diffuseLight);
-	//glLightfv(light, GL_SPECULAR, specularLight);
 	glLightfv(light, GL_POSITION, position);
 
 	glDisable(GL_LIGHTING);
 	glColor3d(1, 1, 0);
 	glPushMatrix();
-	//glRotated(0, 0, 1, 0);
-	glTranslated(x, y, z);
-	glScaled(0.25, 0.25, 0.25);
-	DrawSphere(60, 60, 1, -PI / 2, PI / 2);
+		glTranslated(x, y, z);
+		glScaled(0.25, 0.25, 0.25);
+		DrawSphere(60, 60, 1, -PI / 2, PI / 2);
 	glPopMatrix();
 
 	glEnable(GL_LIGHTING);
@@ -517,32 +497,32 @@ void drawFence(int disatnce)
 	// draw wall betweem pillar 3 -4
 	glColor3d(0.54, 0.27, 0.07);
 	glPushMatrix();
-	glTranslated(disatnce , 0, -disatnce / 2);
-	glScaled(0.1, 3, disatnce / 2);
-	DrawCube();
+		glTranslated(disatnce , 0, -disatnce / 2);
+		glScaled(0.1, 3, disatnce / 2);
+		DrawCube();
 	glPopMatrix();
 
 	// draw wall betweem pillar 1 -4
 	glColor3d(0.54, 0.27, 0.07);
 	glPushMatrix();
-	glTranslated(disatnce / 5, 0, 0);
-	glScaled(disatnce /5, 3, 0.1);
-	DrawCube();
+		glTranslated(disatnce / 5, 0, 0);
+		glScaled(disatnce /5, 3, 0.1);
+		DrawCube();
 	glPopMatrix();
 
 	glColor3d(0.54, 0.27, 0.07);
 	glPushMatrix();
-	glTranslated(disatnce-disatnce / 5, 0, 0);
-	glScaled(-disatnce / 5, 3, 0.1);
-	DrawCube();
+		glTranslated(disatnce-disatnce / 5, 0, 0);
+		glScaled(-disatnce / 5, 3, 0.1);
+		DrawCube();
 	glPopMatrix();
 
 	//draw road
 	glColor3d(0.54, 0.27, 0.07);
 	glPushMatrix();
-	glTranslated(disatnce/2, 0, 0 -10);
-	glScaled(3, 0.1, disatnce / 4);
-	DrawCube();
+		glTranslated(disatnce/2, 0, 0 -10);
+		glScaled(3, 0.1, disatnce / 4);
+		DrawCube();
 	glPopMatrix();
 }
 void DrawSquare()
@@ -1112,7 +1092,7 @@ void display()
 	glutSwapBuffers();
 }
 
-void idle() // WRITE OFFSETS IN THIS METHOD
+void idle()
 {
 	// change position with keyboard
 	sight += angular_speed;
